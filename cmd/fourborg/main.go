@@ -19,6 +19,7 @@ func main() {
 	var addr = flag.String("addr", ":8080", "http service address")
 	var webcamHost = flag.String("webcamHost", "localhost", "Host of webcam image.")
 	var webcamPort = flag.Uint("webcamPort", 8080, "Port of webcam image.")
+	var assets = flag.String("assets", "./assets", "Folder with html assets")
 
 	flag.Parse()
 
@@ -66,7 +67,7 @@ func main() {
 
 	http.HandleFunc("/webcam", func(w http.ResponseWriter, r *http.Request) { wh.Handle(w, r) })
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) { h.ServeWs(w, r) })
-	http.Handle("/", http.FileServer(http.Dir("./assets")))
+	http.Handle("/", http.FileServer(http.Dir(*assetPath)))
 
 	err := http.ListenAndServe(*addr, nil)
 	if err != nil {
