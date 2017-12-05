@@ -3,9 +3,9 @@ package fourborg
 import (
 	"sync"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/joek/picoborgrev"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/i2c"
 )
 
 var _ gobot.Driver = (*FourBorgDriver)(nil)
@@ -43,13 +43,18 @@ func (d *FourBorgDriver) Name() string {
 	return d.name
 }
 
+// SetName is setting the robot name
+func (d *FourBorgDriver) SetName(n string) {
+	d.name = n
+}
+
 // Connection is returning the i2c connection
 func (d *FourBorgDriver) Connection() gobot.Connection {
 	return d.connection
 }
 
 // Start is starting the robot
-func (d *FourBorgDriver) Start() []error {
+func (d *FourBorgDriver) Start() error {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
@@ -59,15 +64,12 @@ func (d *FourBorgDriver) Start() []error {
 	}
 
 	err := d.motor.ResetEPO()
-	if err != nil {
-		return []error{err}
-	}
 
-	return nil
+	return err
 }
 
 // Halt is stopping the robot
-func (d *FourBorgDriver) Halt() []error {
+func (d *FourBorgDriver) Halt() error {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 

@@ -1,0 +1,48 @@
+#!/bin/bash
+# /etc/init.d/fourborg
+
+### BEGIN INIT INFO
+# Provides:          fourborg
+# Required-Start:    $network
+# Required-Stop:     $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: BORG
+# Description:       Starts mjpeg-streamer and BORG web UI.
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+BORG_NAME=fourborg
+BORG_CMD=/usr/local/bin/${BORG_NAME}
+BORG_ASSETS=/var/lib/fourborg/www/
+BORG_OPTIONS=(-addr :80 -webcamPort 8080 -assetPath ${BORG_ASSETS})
+BORG_PID=/var/run/${BORG_NAME}.pid
+MJPG_NAME=mjpg_streamer
+MJPG_CMD=/usr/local/bin/${MJPG_NAME}
+MJPG_OPTIONS=(-o 'output_http.so ' -i 'input_raspicam.so -hf')
+MJPG_PID=/var/run/${MJPG_NAME}.pid
+MJPG_USER=pi
+
+case "$1" in
+    start)
+        echo "Starting mjpeg-streamer"
+      start-stop-daemon --start --background --quiet --pidfile $MJPG_PID --make-pidfile \
+       --chuid $MJPG_USER --user $MJPG_USER --exec ${MJPG_CMD} -- "${MJPG_OPTIONS[@]}"
+      start-stop-daemon --start --background --quiet --pidfile $BORG_PID --make-pidfile \
+       --exec ${BORG_CMD} -- "${BORG_OPTIONS[@]}"
+
+        ;;
+    stop)
+        echo "Stopping mjpeg-streamer"
+        start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --user $MJPG_USER --pidfile $MJPG_PID
+        start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5  --pidfile $BORG_PID
+
+        ;;
+    *)
+        echo "Usage: /etc/init.d/fourborg start|stop"
+        exit 1
+        ;;
+esac
+
+exit 0

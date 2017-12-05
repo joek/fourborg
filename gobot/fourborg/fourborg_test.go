@@ -24,7 +24,7 @@ var _ = Describe("FourBorg", func() {
 	It("Is starting the robot", func() {
 		m1 := false
 		epo1 := false
-		motor.StartImpl = func() []error {
+		motor.StartImpl = func() error {
 			m1 = true
 			return nil
 		}
@@ -44,7 +44,7 @@ var _ = Describe("FourBorg", func() {
 
 	It("Is stopping the robot", func() {
 		stop1 := false
-		motor.HaltImpl = func() []error {
+		motor.HaltImpl = func() error {
 			stop1 = true
 			return nil
 		}
